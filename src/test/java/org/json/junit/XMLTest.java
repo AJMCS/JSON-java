@@ -1249,7 +1249,7 @@ public class XMLTest {
     @Test
     public void testIndentComplicatedJsonObjectWithArrayAndWithConfig(){
         try (InputStream jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.json")) {
-            final JSONObject object = new JSONObject(new JSONTokener(jsonStream));
+            JSONObject object = new JSONObject(new JSONTokener(jsonStream));
             TreeMap<String, Object> sortedMap = new TreeMap<>(object.toMap());
             object = new JSONObject(sortedMap);
             String actualString = XML.toString(object, null, XMLParserConfiguration.KEEP_STRINGS, 2);

@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Map;
 
 import org.json.*;
@@ -1248,7 +1249,8 @@ public class XMLTest {
     @Test
     public void testIndentComplicatedJsonObjectWithArrayAndWithConfig(){
         try (InputStream jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.json")) {
-            final JSONObject object = new JSONObject(new JSONTokener(jsonStream));
+            JSONObject object = new JSONObject(new JSONTokener(jsonStream));
+            object = (JSONObject) deepSort(object);
             String actualString = XML.toString(object, null, XMLParserConfiguration.KEEP_STRINGS, 2);
             try (InputStream xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.xml")) {
                 int bufferSize = 1024;
@@ -1262,6 +1264,26 @@ public class XMLTest {
             }
         } catch (IOException e) {
             fail("file writer error: " +e.getMessage());
+        }
+    }
+
+    private static Object deepSort(Object input) {
+        if (input instanceof JSONObject) {
+            JSONObject obj = (JSONObject) input;
+            TreeMap<String, Object> sorted = new TreeMap<>();
+            for (String key : obj.keySet()) {
+                sorted.put(key, deepSort(obj.get(key)));
+            }
+            return new JSONObject(sorted);
+        } else if (input instanceof JSONArray) {
+            JSONArray array = (JSONArray) input;
+            JSONArray sortedArray = new JSONArray();
+            for (int i = 0; i < array.length(); i++) {
+                sortedArray.put(deepSort(array.get(i)));
+            }
+            return sortedArray;
+        } else {
+            return input;
         }
     }
 

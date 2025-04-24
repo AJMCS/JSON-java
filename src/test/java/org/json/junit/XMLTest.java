@@ -20,6 +20,7 @@ import java.io.Reader;
 import java.io.StringReader;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.TreeMap;
 import java.util.Map;
 
 import org.json.*;
@@ -1249,8 +1250,8 @@ public class XMLTest {
     public void testIndentComplicatedJsonObjectWithArrayAndWithConfig(){
         try (InputStream jsonStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.json")) {
             final JSONObject object = new JSONObject(new JSONTokener(jsonStream));
-            TreeMap<String, Object> sortedMap = new TreeMap<>(object.ToMap());
-            JSONObject object = new JSONObject(sortedMap);
+            TreeMap<String, Object> sortedMap = new TreeMap<>(object.toMap());
+            object = new JSONObject(sortedMap);
             String actualString = XML.toString(object, null, XMLParserConfiguration.KEEP_STRINGS, 2);
             try (InputStream xmlStream = XMLTest.class.getClassLoader().getResourceAsStream("Issue593.xml")) {
                 int bufferSize = 1024;
